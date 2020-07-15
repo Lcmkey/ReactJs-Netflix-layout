@@ -1,12 +1,22 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const Dotenv = require("dotenv-webpack");
+
+const { PORT, NODE_ENV = "Dev" } = process.env;
+
+const ENVMapping = {
+  Dev: "development",
+  Prod: "production"
+};
 
 module.exports = {
+  devtool: "source-map", //dev: "source-map" / production: false / cheap-module-eval-source-map
+  mode: ENVMapping[NODE_ENV], // development || production
   entry: {
     main: path.join(__dirname, "client/src/index.js")
   },
   output: {
-    path: path.join(__dirname, "build"),
+    path: path.join(__dirname, "dist"),
     filename: "bundle.js"
   },
   plugins: [
@@ -14,7 +24,8 @@ module.exports = {
       title: "App title here",
       template: path.join(__dirname, "client/public/index.ejs"),
       filename: "index.html"
-    })
+    }),
+    new Dotenv()
   ],
   module: {
     rules: [
@@ -49,10 +60,10 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.join(__dirname, "build"),
+    contentBase: path.join(__dirname, "dist"),
     compress: true,
     proxy: {
-      "/api": "http://localhost:3000"
+      "/api": `http://localhost:${PORT}`
     }
   },
   resolve: {
